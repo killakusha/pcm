@@ -1,0 +1,62 @@
+import numpy as np
+import matplotlib
+matplotlib.use('tkAgg')
+import matplotlib.pyplot as plt
+
+#--------------------MODULATION----------------------------------------------
+
+n = int(input('Enter the no. of bits for PCM = '))
+fm = int(input('Enter the message frequency = '))
+A = 1
+fs = 100*fm
+tlen = 1
+t = np.arange(np.round(tlen*fs))/float(fs)
+
+sx = A*(np.sin(2*np.pi*fm*t))
+sig0 = (A+(sx))/2
+
+q = (2**n)-1
+sig1 = np.array(np.round(sig0*q))
+sig1 = np.int_(sig1)
+
+pcode = np.empty(len(sig1),dtype=object)
+for i in range(len(sig1)):
+    pcode[i] = np.binary_repr(sig1[i],width=n)
+print('Binary Serial Output')
+print(pcode)
+
+#---------------------DEMODULATION-------------------------------------------------
+
+sig2 = np.empty(len(sig1), dtype=object)
+for i in  range(len(sig1)):
+        sig2[i] = int((pcode[i]),2)
+
+recsig = []
+for i in range(len(sig1)):
+    sig2 = sig2.astype('float')
+    recsig.append((2*(sig2[i])/q)-A)
+
+#--------------------WAVEFORMS------------------------------------------------------
+plt.plot(t,sx,color='y')
+plt.stem(t,sx,'y',label='Sampled Signal')
+plt.legend()
+plt.grid()
+plt.title("Signal")
+plt.plot(t,sig0,'g',label='Leve-Shifted Signal')
+plt.legend()
+plt.xlabel("Time")
+plt.ylabel("Amplitude")
+plt.show()
+
+plt.step(t,sig2,label='Decoded Quantized signal',color= 'r')
+plt.legend()
+plt.ylabel("Amplitude")
+plt.show()
+
+plt.step(t,recsig,label='Recovered Signal',color='r')
+plt.legend()
+plt.ylabel("Amplitude")
+plt.show()
+
+
+
